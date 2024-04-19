@@ -65,3 +65,52 @@ SELECT MIN(latitude) AS min_lat,
 		MAX(longitude) AS max_lon
 FROM scooters
 -- 0.000000	3609874.116666	-97.443879	0.000000
+
+SELECT MIN(startlatitude) AS min_lat,
+		MAX(startlatitude) AS max_lat,
+		MIN(startlongitude) AS min_lon,
+		MAX(startlongitude) AS max_lon,
+		MIN(endlatitude) AS endmin_lat,
+		MAX(endlatitude) AS endmax_lat,
+		MIN(endlongitude) AS endmin_lon,
+		MAX(endlongitude) AS endmax_lon
+FROM trips
+
+/**** What is the range of values for trip duration and trip distance? Do these values make sense? Explore values that might seem questionable. ****/
+SELECT MIN(tripduration),
+		MAX(tripduration),
+		MIN(tripdistance),
+		MAX(tripdistance)
+	FROM trips
+	
+/**** Check out how the values for the company name column in the scooters table compare to those of the trips table. What do you notice?
+ ****/
+ SELECT DISTINCT companyname
+ FROM scooters
+ 
+  SELECT DISTINCT companyname
+ FROM trips
+--  bolt vs bolt mobility, capitalization.
+
+
+/********* 1 ********/
+/* During this period, seven companies offered scooters. How many scooters did each company have in this time frame? Did the number for each company change over time? Did scooter usage vary by company? */
+SELECT *
+FROM scooters 
+WHERE companyname iLike 'Bird'
+	AND EXTRACT(MONTH FROM pubdatetime) = 5
+	AND sumdgroup != 'bicycle'
+-- 	4334006
+
+WITH filter_id AS (SELECT sumdid
+				FROM trips
+				GROUP BY sumdid
+				HAVING COUNT(sumdid) = 1
+					AND ((SUM(tripdistance) <= 0) OR (SUM(tripduration) <= 0)))
+					
+SELECT *
+FROM scooters
+WHERE companyname iLike 'Bird'
+	AND EXTRACT(MONTH FROM pubdatetime) = 5
+	AND sumdgroup != 'bicycle'
+	AND sumdid NOT IN (SELECT sumdid FROM filter_id)
