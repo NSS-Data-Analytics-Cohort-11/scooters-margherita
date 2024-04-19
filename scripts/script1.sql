@@ -1,10 +1,10 @@
 -- explore data
 Select *
-FROM scooters LIMIT 10;
+FROM scooters LIMIT 1000;
 -- 9 columns
 
 SELECT *
-FROM trips LIMIT 10; 
+FROM trips LIMIT 1000; 
 -- 16 columns
 
 -- find nulls
@@ -55,4 +55,30 @@ WHERE sumdid NOT LIKE 'standard';
 
 -- What are the minimum and maximum values for all the latitude and longitude columns? Do these ranges make sense, or is there anything surprising? 
 --What is the range of values for trip duration and trip distance? Do these values make sense? Explore values that might seem questionable.
-SELECT latitude, longitude
+SELECT MIN(latitude), MAX(latitude), MIN(longitude), MAX(latitude)
+FROM scooters;
+-- The values seem erronious ecept from min longitude maybe there are missing decimals
+
+SELECT MIN(tripduration), MAX(tripduration), MIN(tripdistance), MAX(tripdistance)
+FROM trips;
+-- negative distances seem weird
+
+-- Check out how the values for the company name column in the scooters table compare to those of the trips table. What do you notice?
+-- They are ordered in scooters but not in trips
+
+-- Q1
+SELECT companyname, Count(DISTINCT sumdid)
+FROM scooters
+GROUP BY companyname
+
+SELECT companyname, Count(DISTINCT sumdid), EXTRACT(MONTH FROM pubdatetime) as month
+FROM scooters
+GROUP BY companyname, month;
+
+SELECT sumdid, latitude
+FROM scooters
+WHERE latitude > 37
+OR latitude < 35;
+
+df.to_csv('Biodata.csv', index=False)
+
