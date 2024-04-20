@@ -95,6 +95,7 @@ SELECT MIN(tripduration),
 
 /********* 1 ********/
 /* During this period, seven companies offered scooters. How many scooters did each company have in this time frame? Did the number for each company change over time? Did scooter usage vary by company? */
+-- excludes: bikes, scooters with only1 trip with a distance or durtation of 0, lat and lon outsid e of nashville area
 SELECT *
 FROM scooters 
 WHERE companyname iLike 'Bird'
@@ -110,7 +111,20 @@ WITH filter_id AS (SELECT sumdid
 					
 SELECT *
 FROM scooters
-WHERE companyname iLike 'Bird'
-	AND EXTRACT(MONTH FROM pubdatetime) = 5
+WHERE EXTRACT(MONTH FROM pubdatetime) = 5
 	AND sumdgroup != 'bicycle'
 	AND sumdid NOT IN (SELECT sumdid FROM filter_id)
+	AND latitude BETWEEN 36.0 AND 36.3
+	AND longitude BETWEEN -86.9 AND -86.2
+	
+	
+/**** trips filtering*****/
+-- excludes bikes
+WITH bikes AS (SELECT DISTINCT sumdid
+				FROM scooters
+				WHERE sumdgroup = 'bicycle')
+
+
+SELECT *
+FROM trips
+WHERE sumdid NOT IN (SELECT sumdid FROM bikes)
